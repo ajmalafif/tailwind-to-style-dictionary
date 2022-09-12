@@ -1,6 +1,17 @@
 const resolveConfig = require('tailwindcss/resolveConfig');
 const tailwindConfig = require('./tailwind.config.js');
 const _ = require("lodash");
+const { transform } = require("@divriots/style-dictionary-to-figma");
+// const StyleDictionary = require("style-dictionary");
+
+// StyleDictionary.registerFormat({
+//   name: "figmaTokensPlugin",
+//   formatter: ({ dictionary }) => {
+//     const transformedTokens = transform(dictionary.tokens);
+//     return JSON.stringify(transformedTokens, null, 2);
+//   },
+// });
+
 
 // Grab just the theme data from the Tailwind config.
 const { theme } = resolveConfig(tailwindConfig);
@@ -97,7 +108,28 @@ const fullFilter = (token) =>
 
 module.exports = {
   tokens,
+  source: ["**/*.tokens.json"],
+  format: {
+    figmaTokensPlugin: ({ dictionary }) => {
+      const transformedTokens = transform(dictionary.tokens);
+      return JSON.stringify(transformedTokens, null, 2);
+    },
+  },
   platforms: {
+    json: {
+      transformGroup: "js",
+      buildPath: "tokens/",
+      files: [
+        {
+          format: "figmaTokensPlugin",
+          destination: "tokens.json",
+          filter: fullFilter,
+          options: {
+            outputReferences: true,
+          },
+        },
+      ],
+    },
     js: {
       transformGroup: "js",
       buildPath: "dist/js/",
