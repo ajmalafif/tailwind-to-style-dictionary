@@ -2,19 +2,10 @@ const resolveConfig = require('tailwindcss/resolveConfig');
 const tailwindConfig = require('./tailwind.config.js');
 const _ = require("lodash");
 const { transform } = require("@divriots/style-dictionary-to-figma");
-// const StyleDictionary = require("style-dictionary");
-
-// StyleDictionary.registerFormat({
-//   name: "figmaTokensPlugin",
-//   formatter: ({ dictionary }) => {
-//     const transformedTokens = transform(dictionary.tokens);
-//     return JSON.stringify(transformedTokens, null, 2);
-//   },
-// });
-
 
 // Grab just the theme data from the Tailwind config.
 const { theme } = resolveConfig(tailwindConfig);
+
 
 // Create an empty object to hold our transformed tokens data.
 const tokens = {};
@@ -29,6 +20,9 @@ const addToTokensObject = function (position, value) {
 
 // Loop over the theme data…
 _.forEach(theme, function (value, key) {
+
+  console.log(key)
+  
   switch (key) {
     case 'fontFamily':
       // Font family data is in an array, so we use join to
