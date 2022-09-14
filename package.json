@@ -14,5 +14,8 @@
     "postcss": "^8.4.16",
     "style-dictionary": "^3.7.1",
     "tailwindcss": "^3.1.8"
+  },
+  "dependencies": {
+    "@divriots/style-dictionary-to-figma": "^0.3.2"
   }
 }
