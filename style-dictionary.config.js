@@ -28,7 +28,6 @@ const addToTokensObject = function (position, value, attr = null) {
 
 // Loop over the theme data…
 _.forEach(theme, function (value, key) {
-  console.log({ key });
   switch (key) {
     case "fontFamily":
       // Font family data is in an array, so we use join to
@@ -62,7 +61,6 @@ _.forEach(theme, function (value, key) {
         addToTokensObject(["lineHeights", key], valuePx, {
           type: "lineHeights",
         });
-        console.log(valuePx);
       });
       break;
 
@@ -116,8 +114,6 @@ const fullFilter = (token) =>
     "transitionDelay",
     "animation",
   ].includes(token.attributes.category);
-
-console.log(tokens.lineHeights);
 
 module.exports = {
   tokens,
