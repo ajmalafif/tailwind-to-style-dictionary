@@ -1,7 +1,16 @@
-const resolveConfig = require('tailwindcss/resolveConfig');
-const tailwindConfig = require('./tailwind.config.js');
+const resolveConfig = require("tailwindcss/resolveConfig");
+const tailwindConfig = require("./tailwind.config.js");
 const _ = require("lodash");
 const { transform } = require("@divriots/style-dictionary-to-figma");
+// const StyleDictionary = require("style-dictionary");
+
+// StyleDictionary.registerFormat({
+//   name: "figmaTokensPlugin",
+//   formatter: ({ dictionary }) => {
+//     const transformedTokens = transform(dictionary.tokens);
+//     return JSON.stringify(transformedTokens, null, 2);
+//   },
+// });
 
 // Grab just the theme data from the Tailwind config.
 const { theme } = resolveConfig(tailwindConfig);
@@ -14,8 +23,8 @@ const tokens = {};
 // insert things into an object at the right point in the
 // structure, and to create the right structure for us
 // if it doesn't already exist.
-const addToTokensObject = function (position, value) {
-  _.setWith(tokens, position, { value: value }, Object);
+const addToTokensObject = function (position, value, attr = null) {
+  _.setWith(tokens, position, { value: value, ...attr }, Object);
 };
 
 // Loop over the theme data…
@@ -24,28 +33,38 @@ _.forEach(theme, function (value, key) {
   console.log(key)
   
   switch (key) {
-    case 'fontFamily':
+    case "fontFamily":
       // Font family data is in an array, so we use join to
       // turn the font families into a single string.
-      _.forEach(theme['fontFamily'], function (value, key) {
+      _.forEach(theme["fontFamily"], function (value, key) {
         addToTokensObject(
-          ['fontFamily', key],
-          theme['fontFamily'][key].join(',')
+          ["fontFamily", key],
+          theme["fontFamily"][key].join(",")
         );
       });
       break;
 
-    case 'fontSize':
+    case "fontSize":
       // Font size data contains both the font size (makes
       // sense!) but also a recommended line-length, so we
       // create two tokens for every font size, one for the
       // font-size value and one for the line-height.
-      _.forEach(theme['fontSize'], function (value, key) {
-        addToTokensObject(['fontSize', key], value[0]);
+      _.forEach(theme["fontSize"], function (value, key) {
+        addToTokensObject(["fontSize", key], value[0]);
         addToTokensObject(
-          ['fontSize', `${key}--lineHeight`],
-          value[1]['lineHeight']
+          ["fontSize", `${key}--lineHeight`],
+          value[1]["lineHeight"]
         );
+      });
+      break;
+
+    case "lineHeight":
+      _.forEach(theme["lineHeight"], function (value, key) {
+        // convert rem to px
+        const valuePx = parseFloat(value) * 16;
+        addToTokensObject(["lineHeights", key], valuePx, {
+          type: "lineHeights",
+        });
       });
       break;
 
@@ -57,7 +76,7 @@ _.forEach(theme, function (value, key) {
           addToTokensObject([key, secondLevelKey], value);
         } else {
           // Skip 'raw' CSS media queries.
-          if (!_.isUndefined(value['raw'])) {
+          if (!_.isUndefined(value["raw"])) {
             return;
           }
 
@@ -89,7 +108,7 @@ const fullFilter = (token) =>
     "fontSize",
     "fontWeight",
     "letterSpacing",
-    "lineHeight",
+    "lineHeights",
     "maxWidth",
     "zIndex",
     "scale",
